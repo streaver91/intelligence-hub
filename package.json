@@ -1,0 +1,22 @@
+{
+  "name": "intelligence-hub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production PORT=3000 node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streaver91/intelligence-hub.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/streaver91/intelligence-hub/issues"
+  },
+  "homepage": "https://github.com/streaver91/intelligence-hub#readme",
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}
