@@ -6,8 +6,8 @@
   "scripts": {
     "build": "npx gulp build",
     "watch": "npx gulp watch",
-    "start": "NODE_ENV=production PORT=3000 node index.js",
-    "dev": "PORT=3000 npx gulp dev"
+    "start": "node index.js",
+    "dev": "npx gulp dev"
   },
   "repository": {
     "type": "git",
