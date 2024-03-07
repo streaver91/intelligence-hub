@@ -7,6 +7,7 @@ const port = process.env.PORT;
 
 const app = express();
 
+app.set('x-powered-by', false);
 app.set('view engine', 'ejs');
 app.set('view options', { openDelimiter: '{', closeDelimiter: '}' });
 app.set('views', path.join(__dirname, '/dist/views'));
@@ -18,5 +19,5 @@ app.use('/', express.static(path.join(__dirname, 'public'), {
 app.use('/', indexRouter);
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Intelligence Hub listening on port ${port}`);
 });
