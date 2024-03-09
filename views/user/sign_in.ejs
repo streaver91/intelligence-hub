@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Sign in - Intelligence Hub</title>
+  <link rel="stylesheet" href="/styles/common.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to Intelligence Hub account.">
+  <script defer src="https://unpkg.com/vue@3/dist/vue.global.prod.js"
+    crossorigin="anonymous"></script>
+  <script defer src="/scripts/common.js"></script>
+</head>
+
+<body>
+  <form id="app" v-cloak>
+    <div class="form__group">
+      <label for="email">Email</label>
+      <input type="email" spellcheck="false" id="email" inputmode="email" v-model.trim="email"
+        @input="errors.email=''" autocomplete="email" required>
+      <div class="form__error" v-text="errors.email"></div>
+    </div>
+    <div class="form__group">
+      <label for="password">Password</label>
+      <input :type="show_password ? 'input' : 'password'" type="password" id="password"
+        v-model.trim="password" @input="errors.password=''" @keyup.enter="signIn"
+        autocomplete="current-password" required>
+      <div class="form__error" v-text="errors.password"></div>
+    </div>
+    <div class="form__group form__group--inline">
+      <input id="show_password" type="checkbox" v-model="show_password">
+      <label for="show_password">Show password.</label>
+    </div>
+    <div class="form__group form__group--inline">
+      <input id="keep" type="checkbox" v-model="keep">
+      <label for="keep">Keep me signed in.</label>
+    </div>
+    <div class="form__group">
+      <button @click="signIn" :disabled="pending.app">
+        <span>Sign in</span>
+        <span v-if="pending.app">...</span>
+      </button>
+      <div class="form__oops" v-text="oops.app"></div>
+    </div>
+  </form>
+</body>
+<script>
+  window.onload = () => {
+    common.createApp('#app', {
+      email: '',
+      password: '',
+      show_password: false,
+      keep: true,
+    }, {
+      signIn() {
+        this.submit('/user/sign_in', ['email', 'password', 'keep']);
+      }
+    });
+  };
+</script>
+
+</html>
