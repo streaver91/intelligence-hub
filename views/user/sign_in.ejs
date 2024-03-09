@@ -12,7 +12,8 @@
   <script defer src="/scripts/common.js"></script>
 </head>
 
-<body>
+<div class="content content--narrow">
+  <h1>Sign in</h1>
   <form id="app" v-cloak>
     <div class="form__group">
       <label for="email">Email</label>
@@ -35,6 +36,7 @@
       <input id="keep" type="checkbox" v-model="keep">
       <label for="keep">Keep me signed in.</label>
     </div>
+    <br>
     <div class="form__group">
       <button @click="signIn" :disabled="pending.app">
         <span>Sign in</span>
@@ -43,7 +45,8 @@
       <div class="form__oops" v-text="oops.app"></div>
     </div>
   </form>
-</body>
+</div>
+
 <script>
   window.onload = () => {
     common.createApp('#app', {

@@ -1,3 +1,152 @@
+@blue-400: #3d8bfd;
+@blue-600: #0a58ca;
+@gray-400: #ced4da;
+@gray-600: #6c757d;
+@gray-900: #212529;
+@red: #dc3545;
+@transition-time: 0.15s;
+
+.user-select(@user-select) {
+  -webkit-user-select: @user-select;
+  -moz-user-select: @user-select;
+  -ms-user-select: @user-select;
+  user-select: @user-select;
+}
+
+body {
+  min-height: 100vh;
+  min-width: 22rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
 [v-cloak] {
   display: none;
+}
+
+
+input[type="email"],
+input[type="password"],
+input[type="input"] {
+  border: 1px solid @gray-400;
+  border-radius: 0.375rem;
+  display: block;
+  font-size: 1rem;
+  outline: none;
+  padding: 0.4rem 0.75rem;
+  transition: border-color @transition-time ease-in-out, box-shadow @transition-time ease-in-out;
+  width: 100%;
+
+  &:focus {
+    border: 1px solid @blue-600;
+    box-shadow: 0 0 0 0.1rem fade(@blue-600, 100);
+  }
+}
+
+input[type=checkbox] {
+  margin-right: 0;
+
+  &+* {
+    padding-left: 0.5rem;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+button {
+  align-items: center;
+  background-color: @blue-600;
+  border: none;
+  border-radius: 1.2rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  font-size: 1rem;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color @transition-time ease-in-out;
+  vertical-align: middle;
+  width: 100%;
+  .user-select(none);
+
+  &:hover {
+    background-color: @blue-400;
+  }
+
+  &:disabled {
+    background-color: @gray-600;
+    pointer-events: none;
+  }
+}
+
+.form__group {
+  margin-bottom: 1rem;
+
+  .form__error {
+    color: @red;
+    font-size: 0.85rem;
+  }
+
+  .form__oops {
+    color: @gray-600;
+    font-size: 0.85rem;
+  }
+
+  >* {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.form__group--inline {
+  align-items: center;
+  display: flex;
+  margin-bottom: 0.5rem;
+
+  >* {
+    margin-right: 1rem;
+    margin-bottom: 0;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.content {
+  color: @gray-900;
+  font-size: 1rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 500;
+    letter-spacing: 0.015rem;
+    line-height: 1.25;
+    margin-bottom: 2rem;
+  }
+}
+
+.content--narrow {
+  max-width: 26rem;
 }
