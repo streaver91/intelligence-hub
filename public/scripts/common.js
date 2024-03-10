@@ -4,7 +4,7 @@ const common = ((window) => {
   const common = {};
 
   const TIMEOUT = 5000;
-  const OOPS = 'Oops! Something went wrong. Please try again later.';
+  const OOPS = 'Your most recent request failed. Please retry!';
   const UNKNOWN_ERROR = {
     success: false,
     errors: {}

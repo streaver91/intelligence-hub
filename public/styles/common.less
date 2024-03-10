@@ -99,7 +99,7 @@ button {
 }
 
 button.button--send {
-  width: 6rem;
+  width: 7rem;
 }
 
 .form__group {
@@ -117,7 +117,7 @@ button.button--send {
 }
 
 .form__oops {
-  color: @gray-600;
+  color: @red;
   font-size: 0.85rem;
 }
 
@@ -167,6 +167,50 @@ button.button--send {
 
 .form__chat-messages {
   flex-grow: 1;
+  overflow-y: auto;
+}
+
+.form__chat-messages {
+  padding: 1.5rem;
+}
+
+.form__chat-message {
+  margin-bottom: 1rem;
+}
+
+.form__chat-user {
+  background-color: @blue-600;
+  border-radius: 0.8rem 0.8rem 0.8rem 0;
+  color: white;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+}
+
+.form__chat-message--agents {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.form__agent {
+  flex: 1;
+  padding: 0;
+  margin-right: 1.5rem;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.form__agent-name {
+  font-weight: bold;
+  border-bottom: 2px solid @gray-400;
+  padding: 0 0 0.25rem;
+}
+
+.form__agent-response {
+  font-size: 0.9rem;
+  max-height: 20rem;
+  padding: 0.25rem 0;
   overflow-y: auto;
 }
 
