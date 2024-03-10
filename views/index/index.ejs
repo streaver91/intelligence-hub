@@ -8,8 +8,37 @@
     content="Intelligence Hub aggregates responses from major AI chatbots and search engines, providing a centralized platform to explore intelligence insights across various providers.">
 </head>
 
-<body>
-  Intelligence Hub
-</body>
+<div class="content content--chat">
+  <form id="app" v-cloak>
+    <div class="form__chat-container">
+      <div class="form__chat-messages">
+
+      </div>
+      <div class="form__chat-input">
+        <div class="form__group form__group--inline">
+          <input type="input" spellcheck="false" id="input" v-model.trim="input"
+            placeholder="Message" @keyup.enter.exact="send" required>
+          <button @click="send" :disabled="pending.app" class="button--send">
+            <span>Send</span>
+            <span v-if="pending.app">...</span>
+          </button>
+        </div>
+        <div class="form__oops" v-text="oops.app"></div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  window.onload = () => {
+    common.createApp('#app', {
+      input: '',
+    }, {
+      send() {
+        this.submit('/chat/send', ['input']);
+      }
+    });
+  };
+</script>
 
 </html>

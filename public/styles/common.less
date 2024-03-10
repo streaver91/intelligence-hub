@@ -98,23 +98,27 @@ button {
   }
 }
 
+button.button--send {
+  width: 6rem;
+}
+
 .form__group {
   margin-bottom: 1rem;
-
-  .form__error {
-    color: @red;
-    font-size: 0.85rem;
-  }
-
-  .form__oops {
-    color: @gray-600;
-    font-size: 0.85rem;
-  }
 
   >* {
     display: block;
     margin-bottom: 0.25rem;
   }
+}
+
+.form__error {
+  color: @red;
+  font-size: 0.85rem;
+}
+
+.form__oops {
+  color: @gray-600;
+  font-size: 0.85rem;
 }
 
 .form__group--inline {
@@ -149,4 +153,26 @@ button {
 
 .content--narrow {
   max-width: 26rem;
+}
+
+.content--chat {
+  padding: 0;
+}
+
+.form__chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.form__chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.form__chat-input {
+  background-color: white;
+  border-top: 1px solid @gray-400;
+  margin: 0;
+  padding: 1rem 1.5rem;
 }
