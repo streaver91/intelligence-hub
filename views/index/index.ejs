@@ -3,6 +3,7 @@
 
 <head>
   {%- include('../common/head') -%}
+  <script defer src="/socket.io/socket.io.js"></script>
   <title>Intelligence Hub</title>
   <meta name="description"
     content="Intelligence Hub aggregates responses from major AI chatbots and search engines, providing a centralized platform to explore intelligence insights across various providers.">
@@ -12,35 +13,30 @@
   <form id="app" v-cloak>
     <div class="form__chat-container">
       <div class="form__chat-messages">
-        <div class="form__chat-message">
-          <div class="form__chat-user">Hello</div>
-        </div>
-        <div class="form__chat-message form__chat-message--agents">
-          <div class="form__agent">
-            <div class="form__agent-name">ChatGPT 4</div>
-            <div class="form__agent-response">
-              Spending three days in New York City offers a fantastic opportunity to experience its vibrant culture, iconic landmarks, and diverse neighborhoods. Here's a suggested itinerary to help you make the most of your visit:
-
-### Day 1: Explore Midtown Manhattan
-- **Morning:** Start your day with a visit to the Empire State Building. Its observation decks offer stunning views of the city. Afterwards, enjoy breakfast at a nearby cafe.
-- **Midday:** Take a stroll through Times Square, experiencing the bustling energy and neon lights. Visit the nearby Bryant Park for a more tranquil atmosphere.
-- **Afternoon:** Explore the Museum of Modern Art (MoMA) to see an impressive collection of modern artworks. Then, head to Rockefeller Center; consider taking the Top of the Rock Observation Deck tour for more breathtaking views.
-- **Evening:** Catch a Broadway show. It's a quintessential New York experience. Make sure to book your tickets in advance!
+        <div class="form__chat-message" v-for="message in messages">
+          <div class="form__chat-user" v-if="message.role === 'user'" v-text="message.content">
+          </div>
+          <div class="form__chat-assistants" v-else-if="message.role === 'assistants'">
+            <div class="form__assistant" v-for="(response, assistant) in message.content">
+              <div class="form__assistant-name" v-text="assistant"></div>
+              <div class="form__assistant-response" v-if="typeof response === 'string'"
+                v-text="response === '' ? 'Processing...' : response"></div>
+              <div class="form__assistant-response" v-if="typeof response === 'object'">
+                <ul>
+                  <li class="form__assistant-search-item" v-for="item in response">
+                    <a :href="item.link" target="_blank" v-text="item.title"></a>
+                    <p v-text="item.displayLink" class="form__assistant-search-host"></p>
+                    <p v-text="item.snippet"></p>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <div class="form__agent">
-            <div class="form__agent-name">Claude 3 Opus</div>
-            <div class="form__agent-response">Processing...</div>
-          </div>
-          <div class="form__agent">
-            <div class="form__agent-name">Llama 2 Chat (70B)</div>
-            <div class="form__agent-response">Processing...</div>
           </div>
         </div>
       </div>
       <div class="form__chat-input">
         <div class="form__group form__group--inline">
-          <input type="input" spellcheck="false" id="input" v-model.trim="input"
+          <input ref="focus" type="input" spellcheck="false" id="input" v-model.trim="input"
             placeholder="Message" @keyup.enter.exact="send" required>
           <button @click="send" :disabled="pending.app" class="button--send">
             <span>Send</span>
@@ -56,10 +52,51 @@
 <script>
   window.onload = () => {
     common.createApp('#app', {
+      messages: [],
       input: '',
     }, {
       send() {
-        this.submit('/chat/send', ['input']);
+        if (this.pending.app) {
+          return;
+        }
+        this.pending.app = true;
+        delete this.oops.app;
+        this.messages.push({
+          role: 'user',
+          content: this.input
+        });
+        this.input = '';
+        const socket = io();
+        socket.on('connect', () => {
+          console.log('Connected to server');
+          console.log(this);
+          socket.emit('generate', this.messages);
+        });
+        this.messages.push({
+          role: 'assistants',
+          content: {
+            'ChatGPT 4': '',
+            'Claude 3 Opus': '',
+            'Google Search': '',
+          }
+        });
+        const content = this.messages[this.messages.length - 1].content;
+        socket.on('response', (data) => {
+          console.log(data);
+          if (data === 'END') {
+            socket.disconnect();
+            return;
+          }
+          content['ChatGPT 4'] += data['ChatGPT 4'] || '';
+          content['Claude 3 Opus'] += data['Claude 3 Opus'] || '';
+          if (data['Google Search']) {
+            content['Google Search'] = data['Google Search'];
+          }
+        });
+        socket.on('disconnect', () => {
+          delete this.pending.app;
+          console.log('Disconnected from server');
+        });
       }
     });
   };

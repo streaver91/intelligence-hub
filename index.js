@@ -4,13 +4,18 @@ const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const express = require('express');
 const path = require('path');
+const http = require('http');
+const socketIo = require('socket.io');
 
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
+const createSocket = require('./sockets/index');
 
 const PORT = process.env.PORT;
 
 const app = express();
+const server = http.createServer(app);
+const io = new socketIo.Server(server);
 
 app.set('x-powered-by', false);
 app.set('view engine', 'ejs');
@@ -29,6 +34,8 @@ app.use('/', express.static(path.join(__dirname, 'dist/public'), {
 app.use('/', indexRouter);
 app.use('/user', userRouter);
 
-app.listen(PORT, () => {
+createSocket(io);
+
+server.listen(PORT, () => {
   console.log(`Intelligence Hub listening on port ${PORT}`);
 });

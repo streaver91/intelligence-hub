@@ -11,7 +11,7 @@ const common = ((window) => {
   };
   const DEFAULT_ACTION = 'app';
 
-  const submit = function (url, fields, action) {
+  const submit = async function (url, fields, action) {
     action = action || DEFAULT_ACTION;
     const data = {};
     for (const field of fields) {
@@ -23,41 +23,45 @@ const common = ((window) => {
     delete this.oops[action];
     delete this.success[action];
     this.pending[action] = true;
-    return fetch(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(data),
-      signal: controller.signal,
-    }).then(response => response.json())
-      .then(response => {
-        response.success = response.success || false;
-        if (!response.success) {
-          return Promise.reject(response);
-        }
-        this.success[action] = true;
-        const redirect = response.redirect;
-        if (redirect !== undefined) {
-          window.location.href = redirect;
-        }
-        return response;
-      }, () => {
-        return Promise.reject(UNKNOWN_ERROR);
-      }).catch(response => {
-        response.errors = response.errors || {};
-        if (Object.keys(response.errors).length == 0) {
-          this.oops[action] = OOPS;
-          return response;
-        }
-        for (const field of fields) {
-          if (field in response.errors) {
-            this.errors[field] = response.errors[field];
-          }
-        }
-        return response;
-      }).finally(() => {
-        clearTimeout(controllerTimeout);
-        delete this.pending[action];
+
+    try {
+      let response = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(data),
+        signal: controller.signal,
       });
+      if (!response.ok) {
+        throw UNKNOWN_ERROR;
+      }
+      response = await response.json();
+      response.success = response.success || false;
+      if (!response.success) {
+        throw response;
+      }
+      this.success[action] = true;
+      const redirect = response.redirect;
+      if (redirect !== undefined) {
+        window.location.href = redirect;
+      }
+      return response;
+    } catch (error) {
+      const response = error instanceof Error ? UNKNOWN_ERROR : error;
+      response.errors = response.errors || {};
+      if (Object.keys(response.errors).length == 0) {
+        this.oops[action] = OOPS;
+        return response;
+      }
+      for (const field of fields) {
+        if (field in response.errors) {
+          this.errors[field] = response.errors[field];
+        }
+      }
+      return response;
+    } finally {
+      clearTimeout(controllerTimeout);
+      delete this.pending[action];
+    }
   };
 
   common.createApp = (element, data, methods) => {
@@ -72,6 +76,14 @@ const common = ((window) => {
       },
       created() {
         this.submit = submit.bind(this);
+      },
+      mounted() {
+        console.log(this.$refs.focus);
+        if (this.$refs.focus) {
+          this.$nextTick(() => {
+            this.$refs.focus.focus();
+          });
+        }
       },
       methods: methods,
     }).mount(element);

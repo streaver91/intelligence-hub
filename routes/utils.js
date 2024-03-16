@@ -4,18 +4,18 @@ const wrapAsync = (asyncHandler) => {
   };
 };
 
-const sendFailure = (errors, response, redirect_url) => {
+const sendFailure = (errors, response, redirect) => {
   const content = { success: false, errors: errors };
-  if (redirect_url !== undefined) {
-    content['redirect'] = redirect_url;
+  if (redirect !== undefined) {
+    content['redirect'] = redirect;
   }
   response.send(JSON.stringify(content));
 };
 
-const sendSuccess = (data, response, redirect_url) => {
+const sendSuccess = (data, response, redirect) => {
   const content = { success: true, data: data };
-  if (redirect_url !== undefined) {
-    content['redirect'] = redirect_url;
+  if (redirect !== undefined) {
+    content['redirect'] = redirect;
   }
   response.send(JSON.stringify(content));
 }

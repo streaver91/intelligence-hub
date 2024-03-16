@@ -39,6 +39,18 @@ p,
   display: none;
 }
 
+ul {
+  list-style-type: none;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+a {
+  color: @blue-600;
+  font-weight: bold;
+}
 
 input[type="email"],
 input[type="password"],
@@ -186,12 +198,13 @@ button.button--send {
   padding: 0.25rem 0.75rem;
 }
 
-.form__chat-message--agents {
+.form__chat-assistants {
   display: flex;
+  flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
 
-.form__agent {
+.form__assistant {
   flex: 1;
   padding: 0;
   margin-right: 1.5rem;
@@ -201,17 +214,27 @@ button.button--send {
   }
 }
 
-.form__agent-name {
+.form__assistant-name {
   font-weight: bold;
   border-bottom: 2px solid @gray-400;
   padding: 0 0 0.25rem;
 }
 
-.form__agent-response {
+.form__assistant-response {
   font-size: 0.9rem;
-  max-height: 20rem;
   padding: 0.25rem 0;
-  overflow-y: auto;
+}
+
+.form__assistant-search-host {
+  color: @gray-600;
+  font-size: 0.85rem;
+}
+
+@media screen and (max-width: 767px) {
+  .form__assistant {
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
 }
 
 .form__chat-input {
