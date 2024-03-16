@@ -65,7 +65,7 @@ const common = ((window) => {
   };
 
   common.createApp = (element, data, methods) => {
-    Vue.createApp({
+    const app = Vue.createApp({
       data() {
         return Object.assign({
           oops: {},
@@ -86,7 +86,38 @@ const common = ((window) => {
         }
       },
       methods: methods,
-    }).mount(element);
+    });
+
+    if (window.markdownit !== undefined) {
+      const markdownConfig = {};
+      if (window.hljs !== undefined) {
+        markdownConfig.highlight = (string, language) => {
+          if (language && hljs.getLanguage(language)) {
+            try {
+              return hljs.highlight(string, { language: language }).value;
+            } catch (__) { }
+          }
+          return ''; // use external default escaping
+        }
+      }
+      const md = markdownit(markdownConfig);
+      const renderMarkdown = (element, binding) => {
+        const markdown = binding.value;
+        if (markdown) {
+          element.innerHTML = md.render(markdown);
+        }
+      };
+      app.directive('markdown', {
+        beforeMount(element, binding) {
+          renderMarkdown(element, binding);
+        },
+        updated(element, binding) {
+          renderMarkdown(element, binding);
+        }
+      });
+    }
+
+    app.mount(element);
     document.querySelector(element).addEventListener('submit', (event) => {
       event.preventDefault();
     });

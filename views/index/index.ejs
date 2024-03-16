@@ -2,7 +2,14 @@
 <html lang="en">
 
 <head>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+  <link rel="stylesheet" href="/styles/markdown.css">
   {%- include('../common/head') -%}
+  <script defer
+    src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.2/markdown-it.min.js"></script>
+  <script defer
+    src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script defer src="/socket.io/socket.io.js"></script>
   <title>Intelligence Hub</title>
   <meta name="description"
@@ -12,15 +19,16 @@
 <div class="content content--chat">
   <form id="app" v-cloak>
     <div class="form__chat-container">
-      <div class="form__chat-messages">
+      <div class="form__chat-messages" ref="messages">
         <div class="form__chat-message" v-for="message in messages">
           <div class="form__chat-user" v-if="message.role === 'user'" v-text="message.content">
           </div>
           <div class="form__chat-assistants" v-else-if="message.role === 'assistants'">
             <div class="form__assistant" v-for="(response, assistant) in message.content">
-              <div class="form__assistant-name" v-text="assistant"></div>
-              <div class="form__assistant-response" v-if="typeof response === 'string'"
-                v-text="response === '' ? 'Processing...' : response"></div>
+              <div class="form__assistant-name" v-text="assistant.toUpperCase()"></div>
+              <div class="form__assistant-response markdown-body"
+                v-if="typeof response === 'string'"
+                v-markdown="response === '' ? 'Processing...' : response"></div>
               <div class="form__assistant-response" v-if="typeof response === 'object'">
                 <ul>
                   <li class="form__assistant-search-item" v-for="item in response">
@@ -79,6 +87,9 @@
             'Claude 3 Opus': '',
             'Google Search': '',
           }
+        });
+        this.$nextTick(() => {
+          this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
         });
         const content = this.messages[this.messages.length - 1].content;
         socket.on('response', (data) => {

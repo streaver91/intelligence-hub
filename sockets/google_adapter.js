@@ -4,7 +4,7 @@ const API_KEY = process.env.GOOGLE_API_KEY;
 const SEARCH_ENGINE_ID = process.env.GOOGLE_SEARCH_ENGINE_ID;
 const AGENT_NAME = 'Google Search';
 const API_ENDPOINT = 'https://www.googleapis.com/customsearch/v1';
-const NUM_RESULTS = 3;
+const NUM_RESULTS = 5;
 
 async function search(messages, socket) {
   const query = encodeURIComponent(messages[messages.length - 1].content);
