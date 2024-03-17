@@ -78,7 +78,6 @@ const common = ((window) => {
         this.submit = submit.bind(this);
       },
       mounted() {
-        console.log(this.$refs.focus);
         if (this.$refs.focus) {
           this.$nextTick(() => {
             this.$refs.focus.focus();
@@ -118,9 +117,6 @@ const common = ((window) => {
     }
 
     app.mount(element);
-    document.querySelector(element).addEventListener('submit', (event) => {
-      event.preventDefault();
-    });
   };
 
   return common;

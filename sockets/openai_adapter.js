@@ -1,25 +1,29 @@
 const openai = require('openai');
 
-const API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-const API_KEY = process.env.OPENAI_API_KEY;
-const model = 'gpt-3.5-turbo';
-const AGENT_NAME = 'ChatGPT 4';
+const MODEL = {
+  'eco': 'gpt-3.5-turbo',
+  'pro': 'gpt-4-turbo-preview',
+};
 
-async function generate(messages, socket) {
+module.exports.ASSISTANT_NAME = {
+  'eco': 'CHATGPT 3.5',
+  'pro': 'CHATGPT 4',
+};
+
+module.exports.generate = async (messages, mode, socket) => {
   const client = new openai.OpenAI();
   const stream = await client.chat.completions.create({
     messages: messages,
-    model: "gpt-3.5-turbo",
+    model: MODEL[mode],
     stream: true,
   });
+  const assistantName = this.ASSISTANT_NAME[mode];
   for await (const chunk of stream) {
     const data = {
       type: 'delta',
-      [AGENT_NAME]: chunk.choices[0]?.delta?.content || "",
+      assistant: assistantName,
+      content: chunk.choices[0]?.delta?.content || "",
     };
     socket.emit('response', data);
   }
-  console.log('Stream ended.');
 };
-
-module.exports.generate = generate;

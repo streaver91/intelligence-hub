@@ -17,11 +17,12 @@
 </head>
 
 <div class="content content--chat">
-  <form id="app" v-cloak>
+  <form id="app" @submit.prevent v-cloak>
     <div class="form__chat-container">
       <div class="form__chat-messages" ref="messages">
         <div class="form__chat-message" v-for="message in messages">
-          <div class="form__chat-user" v-if="message.role === 'user'" v-text="message.content">
+          <div class="form__chat-user" v-if="message.role === 'user'">
+            <div class="form__chat-bubble" v-text="message.content"></div>
           </div>
           <div class="form__chat-assistants" v-else-if="message.role === 'assistants'">
             <div class="form__assistant" v-for="(response, assistant) in message.content">
@@ -44,9 +45,13 @@
       </div>
       <div class="form__chat-input">
         <div class="form__group form__group--inline">
+          <button class="form__eco" :class="{'form__eco--active': mode === 'eco'}"
+            @click.prevent="switchMode('eco')">ECO</button>
+          <button class="form__pro" :class="{'form__pro--active': mode === 'pro'}"
+            @click.prevent="switchMode('pro')">PRO</button>
           <input ref="focus" type="input" spellcheck="false" id="input" v-model.trim="input"
-            placeholder="Message" @keyup.enter.exact="send" required>
-          <button @click="send" :disabled="pending.app" class="button--send">
+            placeholder="Message" @keydown.enter.prevent @keyup.enter.exact="send">
+          <button @click.prevent="send" :disabled="pending.app" class="button--send">
             <span>Send</span>
             <span v-if="pending.app">...</span>
           </button>
@@ -62,8 +67,21 @@
     common.createApp('#app', {
       messages: [],
       input: '',
+      mode: 'eco',
+      lastUserMessage: '',
     }, {
+      switchMode(mode) {
+        this.mode = mode;
+        this.$refs.focus.focus();
+        if (this.input.length === 0) {
+          this.input = this.lastUserMessage;
+          this.$refs.focus.select();
+        }
+      },
       send() {
+        if (this.input == '') {
+          return;
+        }
         if (this.pending.app) {
           return;
         }
@@ -71,42 +89,45 @@
         delete this.oops.app;
         this.messages.push({
           role: 'user',
-          content: this.input
+          content: this.input,
+          mode: this.mode,
+        });
+        this.lastUserMessage = this.input;
+        this.$nextTick(() => {
+          this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
         });
         this.input = '';
         const socket = io();
         socket.on('connect', () => {
-          console.log('Connected to server');
-          console.log(this);
           socket.emit('generate', this.messages);
         });
-        this.messages.push({
-          role: 'assistants',
-          content: {
-            'ChatGPT 4': '',
-            'Claude 3 Opus': '',
-            'Google Search': '',
-          }
-        });
-        this.$nextTick(() => {
-          this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
-        });
-        const content = this.messages[this.messages.length - 1].content;
+        let content = null;
         socket.on('response', (data) => {
-          console.log(data);
-          if (data === 'END') {
+          if (data.type === 'init') {
+            this.messages.push({
+              role: 'assistants',
+              content: data.content,
+            });
+            content = this.messages[this.messages.length - 1].content;
+            return;
+          }
+          if (data.type === 'end') {
             socket.disconnect();
             return;
           }
-          content['ChatGPT 4'] += data['ChatGPT 4'] || '';
-          content['Claude 3 Opus'] += data['Claude 3 Opus'] || '';
-          if (data['Google Search']) {
-            content['Google Search'] = data['Google Search'];
+          if (data.type === 'delta') {
+            content[data.assistant] += data.content;
+            return;
+          }
+          if (data.type === 'full') {
+            content[data.assistant] = data.content;
+            this.$nextTick(() => {
+              this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
+            });
           }
         });
         socket.on('disconnect', () => {
           delete this.pending.app;
-          console.log('Disconnected from server');
         });
       }
     });
