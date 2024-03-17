@@ -19,6 +19,10 @@ module.exports.generate = async (messages, mode, socket) => {
   });
   const assistantName = this.ASSISTANT_NAME[mode];
   for await (const chunk of stream) {
+    if (!socket.connected) {
+      stream.controller.abort();
+      break;
+    }
     const data = {
       type: 'delta',
       assistant: assistantName,

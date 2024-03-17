@@ -51,8 +51,13 @@
             @click.prevent="switchMode('pro')">PRO</button>
           <input ref="focus" type="input" spellcheck="false" id="input" v-model.trim="input"
             placeholder="Message" @keydown.enter.prevent @keyup.enter.exact="send">
-          <button @click.prevent="send" :disabled="pending.app" class="button--send">
+          <button @click.prevent="send" :disabled="pending.app" class="button--send"
+            v-if="!pending.app">
             <img src="/images/send.svg" alt="send">
+          </button>
+          <button @click.prevent="stop" :disabled="!pending.app" class="button--stop"
+            v-if="pending.app">
+            <img src="/images/stop.svg" alt="stop">
           </button>
         </div>
         <div class="form__oops" v-text="oops.app"></div>
@@ -68,13 +73,17 @@
       input: '',
       mode: 'eco',
       lastUserMessage: '',
+      socket: null,
     }, {
       switchMode(mode) {
         this.mode = mode;
         this.$refs.focus.focus();
         if (this.input.length === 0) {
           this.input = this.lastUserMessage;
-          this.$refs.focus.select();
+
+          this.$nextTick(() => {
+            this.$refs.focus.select();
+          });
         }
       },
       send() {
@@ -96,12 +105,12 @@
           this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
         });
         this.input = '';
-        const socket = io();
-        socket.on('connect', () => {
-          socket.emit('generate', this.messages);
+        this.socket = io();
+        this.socket.on('connect', () => {
+          this.socket.emit('generate', this.messages);
         });
         let content = null;
-        socket.on('response', (data) => {
+        this.socket.on('response', (data) => {
           if (data.type === 'init') {
             this.messages.push({
               role: 'assistants',
@@ -111,7 +120,7 @@
             return;
           }
           if (data.type === 'end') {
-            socket.disconnect();
+            this.socket.disconnect();
             return;
           }
           if (data.type === 'delta') {
@@ -125,8 +134,16 @@
             });
           }
         });
-        socket.on('disconnect', () => {
+        this.socket.on('disconnect', () => {
           delete this.pending.app;
+        });
+      },
+      stop() {
+        this.socket.disconnect();
+        this.$refs.focus.focus();
+        this.input = this.lastUserMessage;
+        this.$nextTick(() => {
+          this.$refs.focus.select();
         });
       }
     });

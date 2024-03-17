@@ -1,10 +1,10 @@
 const openaiAdapter = require('./openai_adapter');
 const claudeAdapter = require('./claude_adapter');
 const googleAdapter = require('./google_adapter');
+const utils = require('../routes/utils');
 
-const generate = async (messages, assistantAdapter, mode, socket) => {
+const transformMessages = (messages, assistantNames) => {
   const queryMessages = [];
-  assistantNames = Object.values(assistantAdapter.ASSISTANT_NAME);
   for (const message of messages.slice(-7)) {
     if (message.role === 'user') {
       queryMessages.push({ role: 'user', content: message.content });
@@ -19,7 +19,7 @@ const generate = async (messages, assistantAdapter, mode, socket) => {
       }
     }
   }
-  await assistantAdapter.generate(queryMessages, mode, socket);
+  return queryMessages;
 };
 
 const createSocket = (io) => {
@@ -34,10 +34,14 @@ const createSocket = (io) => {
           [claudeAdapter.ASSISTANT_NAME[mode]]: '',
         }
       });
+      const openaiMessages =
+        transformMessages(messages, Object.values(openaiAdapter.ASSISTANT_NAME));
+      const claudeMessages =
+        transformMessages(messages, Object.values(claudeAdapter.ASSISTANT_NAME));
       await Promise.all([
-        generate(messages, openaiAdapter, mode, socket),
-        generate(messages, claudeAdapter, mode, socket),
-        googleAdapter.search(messages, mode, socket),
+        openaiAdapter.generate(openaiMessages, mode, socket),
+        claudeAdapter.generate(claudeMessages, mode, socket),
+        googleAdapter.search(utils.deepCopy(openaiMessages), mode, socket),
       ]);
       socket.emit('response', { type: 'end' });
     });

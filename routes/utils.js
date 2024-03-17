@@ -20,8 +20,11 @@ const sendSuccess = (data, response, redirect) => {
   response.send(JSON.stringify(content));
 }
 
+const deepCopy = object => JSON.parse(JSON.stringify(object));
+
 module.exports = {
   sendFailure,
   sendSuccess,
   wrapAsync,
+  deepCopy,
 };

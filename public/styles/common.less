@@ -114,16 +114,27 @@ button {
   }
 }
 
-button.button--send {
+.button--action {
   flex: 0;
   display: flex;
   height: 2.5rem;
   width: 2.5rem;
   border-radius: 1.25rem;
   img {
-    color: white;
     height: 1.5rem;
     width: 1.5rem;
+  }
+}
+
+button.button--send {
+  .button--action;
+}
+
+button.button--stop {
+  .button--action;
+  background-color: @gray-800;
+  &:hover, &:active {
+    background-color: @gray-600;
   }
 }
 
