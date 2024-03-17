@@ -10,6 +10,7 @@
 @red: #dc3545;
 @green-200: #a3cfbb;
 @green: #198754;
+@green-600: #146c43;
 @transition-time: 0.15s;
 
 .user-select(@user-select) {
@@ -259,7 +260,7 @@ button.button--stop {
   flex: 0;
   color: @gray-600;
   background-color: white;
-  border: 1px solid @gray-600;
+  border: 1px solid @gray;
   padding: 0.375rem 0.75rem;
 
   &:hover, &:active {
@@ -287,7 +288,7 @@ button.button--stop {
 
 .form__eco--active {
   .form__mode--active;
-  border: 1px solid #0f5132;
+  border: 1px solid @green-600;
   background-color: @green;
   &:hover, &:active {
     background-color: @green;
@@ -305,7 +306,7 @@ button.button--stop {
 
 .form__pro--active {
   .form__mode--active;
-  border: 1px solid black;
+  border: 1px solid @gray-900;
   background-color: @gray-800;
   &:hover, &:active {
     background-color: @gray-800;
