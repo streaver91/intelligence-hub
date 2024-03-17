@@ -37,7 +37,7 @@ const createSocket = (io) => {
       await Promise.all([
         generate(messages, openaiAdapter, mode, socket),
         generate(messages, claudeAdapter, mode, socket),
-        googleAdapter.search(messages, socket),
+        googleAdapter.search(messages, mode, socket),
       ]);
       socket.emit('response', { type: 'end' });
     });

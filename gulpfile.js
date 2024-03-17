@@ -34,14 +34,20 @@ gulp.task('copy-favicon', function () {
     .pipe(gulp.dest('dist/public'));
 });
 
+gulp.task('copy-images', function () {
+  return gulp.src('public/images/*')
+    .pipe(gulp.dest('dist/public/images'));
+});
+
 gulp.task('build', gulp.parallel(
-  'minify-html', 'compile-less', 'minify-js', 'copy-favicon'));
+  'minify-html', 'compile-less', 'minify-js', 'copy-favicon', 'copy-images'));
 
 gulp.task('watch', (callback) => {
   gulp.watch('views/**/*.ejs', gulp.series('minify-html'));
   gulp.watch('public/styles/*.less', gulp.series('compile-less'));
   gulp.watch('public/scripts/*.js', gulp.series('minify-js'));
   gulp.watch('public/favicon.ico', gulp.series('copy-favicon'));
+  gulp.watch('public/images/*', gulp.series('copy-images'));
   callback();
 });
 

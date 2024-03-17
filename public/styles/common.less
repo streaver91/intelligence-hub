@@ -115,7 +115,16 @@ button {
 }
 
 button.button--send {
-  width: 7rem;
+  flex: 0;
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 1.25rem;
+  img {
+    color: white;
+    height: 1.5rem;
+    width: 1.5rem;
+  }
 }
 
 .form__group {
@@ -225,7 +234,7 @@ button.button--send {
 .form__assistant-name {
   font-weight: bold;
   border-bottom: 2px solid @gray-400;
-  padding: 0 0 0.25rem;
+  padding: 0.25rem 0;
 }
 
 .form__assistant-response {
@@ -295,16 +304,24 @@ button.button--send {
   }
 }
 
-@media screen and (max-width: 767px) {
-  .form__assistant {
-    flex: 1 1 100%;
-    margin-right: 0;
-  }
-}
-
 .form__chat-input {
   background-color: white;
   border-top: 1px solid @gray-400;
   margin: 0;
   padding: 1rem 1.5rem;
+}
+
+@media screen and (max-width: 767px) {
+  .form__assistant {
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
+
+  .form__chat-input {
+    padding: 1rem;
+  }
+
+  .form__chat-messages {
+    padding: 1rem;
+  }
 }

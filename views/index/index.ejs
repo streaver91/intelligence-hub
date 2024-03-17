@@ -52,8 +52,7 @@
           <input ref="focus" type="input" spellcheck="false" id="input" v-model.trim="input"
             placeholder="Message" @keydown.enter.prevent @keyup.enter.exact="send">
           <button @click.prevent="send" :disabled="pending.app" class="button--send">
-            <span>Send</span>
-            <span v-if="pending.app">...</span>
+            <img src="/images/send.svg" alt="send">
           </button>
         </div>
         <div class="form__oops" v-text="oops.app"></div>
