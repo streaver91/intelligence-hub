@@ -1,7 +1,9 @@
 @blue-400: #3d8bfd;
 @blue-600: #0a58ca;
+@gray-100: #f8f9fa;
 @gray-200: #e9ecef;
 @gray-400: #ced4da;
+@gray: #adb5bd;
 @gray-600: #6c757d;
 @gray-800: #343a40;
 @gray-900: #212529;
@@ -67,11 +69,6 @@ input[type="input"] {
   padding: 0.4rem 0.75rem;
   transition: border-color @transition-time ease-in-out, box-shadow @transition-time ease-in-out;
   width: 100%;
-
-  &:focus {
-    border: 1px solid @blue-600;
-    box-shadow: 0 0 0 0.1rem fade(@blue-600, 100);
-  }
 }
 
 input[type=checkbox] {
