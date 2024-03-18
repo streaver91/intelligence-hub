@@ -67,7 +67,7 @@ input[type="input"] {
   display: block;
   font-size: 1rem;
   outline: none;
-  padding: 0.4rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   transition: border-color @transition-time ease-in-out, box-shadow @transition-time ease-in-out;
   width: 100%;
 }
@@ -88,7 +88,7 @@ button {
   align-items: center;
   background-color: @blue-600;
   border: none;
-  border-radius: 1.2rem;
+  border-radius: 1.25rem;
   color: white;
   cursor: pointer;
   display: flex;
@@ -115,9 +115,10 @@ button {
 .button--action {
   flex: 0;
   display: flex;
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.375rem;
+  width: 2.375rem;
   border-radius: 1.25rem;
+
   img {
     height: 1.5rem;
     width: 1.5rem;
@@ -131,7 +132,9 @@ button.button--send {
 button.button--stop {
   .button--action;
   background-color: @gray-800;
-  &:hover, &:active {
+
+  &:hover,
+  &:active {
     background-color: @gray-600;
   }
 }
@@ -218,11 +221,12 @@ button.button--stop {
 
 .form__chat-bubble {
   background-color: @blue-600;
-  border-radius: 0.8rem 0.8rem 0 0.8rem;
+  border-radius: 1rem 1rem 0 1rem;
   color: white;
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: 0.5rem 1rem;
   text-align: left;
+  max-width: 80%;
 }
 
 .form__chat-assistants {
@@ -263,8 +267,15 @@ button.button--stop {
   background-color: white;
   border: 1px solid @gray;
   padding: 0.375rem 0.75rem;
+  padding-right: 0.5rem;
+  margin-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 0;
+  min-width: 3.625rem;
 
-  &:hover, &:active {
+  &:hover,
+  &:active {
     background-color: @gray-200;
     color: @gray-800;
   }
@@ -272,44 +283,38 @@ button.button--stop {
 
 .form__mode--active {
   color: white;
-  cursor: default;
-  &:hover, &:active {
+  &:hover,
+  &:active {
     color: white;
   }
 }
 
 .form__eco {
   .form__mode;
-  margin-right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right: 0;
-  padding-right: 0.5rem;
 }
 
 .form__eco--active {
   .form__mode--active;
   border: 1px solid @green-600;
   background-color: @green;
-  &:hover, &:active {
+
+  &:hover,
+  &:active {
     background-color: @green;
   }
 }
 
 .form__pro {
   .form__mode;
-  margin-left: 0;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: 0;
-  padding-left: 0.5rem;
 }
 
 .form__pro--active {
   .form__mode--active;
   border: 1px solid @gray-900;
   background-color: @gray-800;
-  &:hover, &:active {
+
+  &:hover,
+  &:active {
     background-color: @gray-800;
   }
 }
@@ -319,6 +324,11 @@ button.button--stop {
   border-top: 1px solid @gray-400;
   margin: 0;
   padding: 1rem 1.5rem;
+
+  input {
+    border-radius: 0 1.25rem 1.25rem 0;
+    padding-right: 1rem;
+  }
 }
 
 @media screen and (max-width: 767px) {

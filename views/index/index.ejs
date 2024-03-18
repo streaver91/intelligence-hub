@@ -46,9 +46,9 @@
       <div class="form__chat-input">
         <div class="form__group form__group--inline">
           <button class="form__eco" :class="{'form__eco--active': mode === 'eco'}"
-            @click.prevent="switchMode('eco')">ECO</button>
+            @click.prevent="switchMode()" v-if="mode==='eco'">ECO</button>
           <button class="form__pro" :class="{'form__pro--active': mode === 'pro'}"
-            @click.prevent="switchMode('pro')">PRO</button>
+            @click.prevent="switchMode()" v-if="mode==='pro'">PRO</button>
           <input ref="focus" type="input" spellcheck="false" id="input" v-model.trim="input"
             placeholder="Message" @keydown.enter.prevent @keyup.enter.exact="send">
           <button @click.prevent="send" :disabled="pending.app" class="button--send"
@@ -75,8 +75,8 @@
       lastUserMessage: '',
       socket: null,
     }, {
-      switchMode(mode) {
-        this.mode = mode;
+      switchMode() {
+        this.mode = this.mode === 'eco' ? 'pro' : 'eco';
         this.$refs.focus.focus();
         if (this.input.length === 0) {
           this.input = this.lastUserMessage;

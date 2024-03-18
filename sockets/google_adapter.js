@@ -29,10 +29,16 @@ module.exports.search = async (messages, mode, socket) => {
   const revisedQuery = JSON.parse(chatCompletionContent).query || rawQuery;
   const query = encodeURIComponent(revisedQuery);
   const url = `${API_ENDPOINT}?key=${API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${query}`;
-  const response = await axios.get(url);
-  const data = response.data;
+  let response = null;
+  try {
+    response = await axios.get(url);
+  } catch {
+    // TODO: handle error
+    return;
+  }
+  const items = response.data?.items || [];
   const results = [];
-  for (const item of data.items.slice(0, MAX_RESULTS[mode])) {
+  for (const item of items.slice(0, MAX_RESULTS[mode])) {
     results.push({
       title: item.title,
       link: item.link,
