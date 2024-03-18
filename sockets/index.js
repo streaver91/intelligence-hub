@@ -22,6 +22,19 @@ const transformMessages = (messages, assistantNames) => {
   return queryMessages;
 };
 
+const generateWithAdapter = async (adapter, messages, mode, socket) => {
+  const queryMessages = transformMessages(messages, adapter.contextNames());
+  try {
+    await adapter.generate(queryMessages, mode, socket);
+  } catch (error) {
+    socket.emit('response', {
+      type: 'full',
+      assistant: adapter.assistantName(mode),
+      content: 'Error: ' + error.message,
+    });
+  }
+};
+
 const createSocket = (io) => {
   io.on('connection', (socket) => {
     socket.on('generate', async (messages) => {
@@ -29,19 +42,15 @@ const createSocket = (io) => {
       socket.emit('response', {
         type: 'init',
         content: {
-          [googleAdapter.ASSISTANT_NAME]: '',
-          [openaiAdapter.ASSISTANT_NAME[mode]]: '',
-          [claudeAdapter.ASSISTANT_NAME[mode]]: '',
+          [googleAdapter.assistantName(mode)]: '',
+          [openaiAdapter.assistantName(mode)]: '',
+          [claudeAdapter.assistantName(mode)]: '',
         }
       });
-      const openaiMessages =
-        transformMessages(messages, Object.values(openaiAdapter.ASSISTANT_NAME));
-      const claudeMessages =
-        transformMessages(messages, Object.values(claudeAdapter.ASSISTANT_NAME));
       await Promise.all([
-        openaiAdapter.generate(openaiMessages, mode, socket),
-        claudeAdapter.generate(claudeMessages, mode, socket),
-        googleAdapter.search(utils.deepCopy(openaiMessages), mode, socket),
+        generateWithAdapter(openaiAdapter, messages, mode, socket),
+        generateWithAdapter(claudeAdapter, messages, mode, socket),
+        generateWithAdapter(googleAdapter, messages, mode, socket),
       ]);
       socket.emit('response', { type: 'end' });
     });

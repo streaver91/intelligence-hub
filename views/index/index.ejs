@@ -117,6 +117,9 @@
               content: data.content,
             });
             content = this.messages[this.messages.length - 1].content;
+            this.$nextTick(() => {
+              this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
+            });
             return;
           }
           if (data.type === 'end') {
@@ -129,9 +132,6 @@
           }
           if (data.type === 'full') {
             content[data.assistant] = data.content;
-            this.$nextTick(() => {
-              this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
-            });
           }
         });
         this.socket.on('disconnect', () => {
