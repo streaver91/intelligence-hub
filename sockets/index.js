@@ -42,7 +42,7 @@ const createSocket = (io) => {
       socket.emit('response', {
         type: 'init',
         content: {
-          [googleAdapter.assistantName(mode)]: '',
+          // [googleAdapter.assistantName(mode)]: '',
           [openaiAdapter.assistantName(mode)]: '',
           [claudeAdapter.assistantName(mode)]: '',
         }
@@ -50,7 +50,7 @@ const createSocket = (io) => {
       await Promise.all([
         generateWithAdapter(openaiAdapter, messages, mode, socket),
         generateWithAdapter(claudeAdapter, messages, mode, socket),
-        generateWithAdapter(googleAdapter, messages, mode, socket),
+        // generateWithAdapter(googleAdapter, messages, mode, socket),
       ]);
       socket.emit('response', { type: 'end' });
     });
