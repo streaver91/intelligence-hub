@@ -30,15 +30,6 @@
               <div class="form__assistant-response markdown-body"
                 v-if="typeof response === 'string'"
                 v-markdown="response === '' ? 'Processing...' : response"></div>
-              <div class="form__assistant-response" v-if="typeof response === 'object'">
-                <ul>
-                  <li class="form__assistant-search-item" v-for="item in response">
-                    <a :href="item.link" target="_blank" v-text="item.title"></a>
-                    <p v-text="item.displayLink" class="form__assistant-search-host"></p>
-                    <p v-text="item.snippet"></p>
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -89,7 +80,7 @@
           break;
         }
       }
-      while (messages[index]?.role !== 'user') {
+      if (messages[index]?.role !== 'user') {
         index += 1;
       }
       localStorage.setItem('messages', JSON.stringify(messages.slice(index)));

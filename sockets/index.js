@@ -1,6 +1,5 @@
 const openaiAdapter = require('./openai_adapter');
 const claudeAdapter = require('./claude_adapter');
-const googleAdapter = require('./google_adapter');
 const utils = require('../routes/utils');
 
 const transformMessages = (messages, assistantNames) => {
@@ -42,7 +41,6 @@ const createSocket = (io) => {
       socket.emit('response', {
         type: 'init',
         content: {
-          // [googleAdapter.assistantName(mode)]: '',
           [openaiAdapter.assistantName(mode)]: '',
           [claudeAdapter.assistantName(mode)]: '',
         }
@@ -50,7 +48,6 @@ const createSocket = (io) => {
       await Promise.all([
         generateWithAdapter(openaiAdapter, messages, mode, socket),
         generateWithAdapter(claudeAdapter, messages, mode, socket),
-        // generateWithAdapter(googleAdapter, messages, mode, socket),
       ]);
       socket.emit('response', { type: 'end' });
     });
