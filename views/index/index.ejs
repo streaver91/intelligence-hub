@@ -89,7 +89,7 @@
           break;
         }
       }
-      if (messages[index]?.role !== 'user') {
+      while (messages[index]?.role !== 'user') {
         index += 1;
       }
       localStorage.setItem('messages', JSON.stringify(messages.slice(index)));
@@ -126,6 +126,7 @@
         if (this.pending.app) {
           return;
         }
+        this.messages = loadConversations();
         this.pending.app = true;
         delete this.oops.app;
         this.messages.push({
