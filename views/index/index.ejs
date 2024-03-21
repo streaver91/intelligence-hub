@@ -19,7 +19,7 @@
 <div class="content content--chat">
   <form id="app" @submit.prevent v-cloak>
     <div class="form__chat-container">
-      <div class="form__chat-messages" ref="messages">
+      <div class="form__chat-messages" ref="scroll">
         <div class="form__chat-message" v-for="message in messages">
           <div class="form__chat-user" v-if="message.role === 'user'">
             <div class="form__chat-bubble" v-text="message.content"></div>
@@ -68,8 +68,35 @@
 
 <script>
   window.onload = () => {
+    const loadConversations = () => {
+      const item = localStorage.getItem('messages');
+      const messages = item ? JSON.parse(item) : [];
+      saveConversation(messages);
+      return messages;
+    };
+
+    const CONVERSATION_RETENTION_DAYS =
+      parseInt('{%= process.env.CONVERSATION_RETENTION_DAYS %}');
+
+    const saveConversation = (messages) => {
+      const SIZE_LIMIT = 4096 * 1024;
+      const TIMESTAMP_LIMIT = Date.now() - 86400 * CONVERSATION_RETENTION_DAYS;
+      let index;
+      let totalSize = 2;
+      for (index = messages.length - 1; index >= 0; --index) {
+        totalSize += JSON.stringify(messages[index]).length + 1;
+        if (totalSize > SIZE_LIMIT || messages[index].timestamp < TIMESTAMP_LIMIT) {
+          break;
+        }
+      }
+      if (messages[index]?.role !== 'user') {
+        index += 1;
+      }
+      localStorage.setItem('messages', JSON.stringify(messages.slice(index)));
+    };
+
     common.createApp('#app', {
-      messages: [],
+      messages: loadConversations(),
       input: '',
       mode: 'eco',
       lastUserMessage: '',
@@ -87,7 +114,13 @@
         }
       },
       send() {
-        if (this.input == '') {
+        if (this.input === '') {
+          return;
+        }
+        if (this.input === 'clear') {
+          this.messages = [];
+          this.input = '';
+          saveConversation(this.messages);
           return;
         }
         if (this.pending.app) {
@@ -99,10 +132,11 @@
           role: 'user',
           content: this.input,
           mode: this.mode,
+          timestamp: Date.now(),
         });
         this.lastUserMessage = this.input;
         this.$nextTick(() => {
-          this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
+          this.$refs.scroll.scrollTop = this.$refs.scroll.scrollHeight;
         });
         this.input = '';
         this.socket = io();
@@ -115,15 +149,17 @@
             this.messages.push({
               role: 'assistants',
               content: data.content,
+              timestamp: Date.now(),
             });
             content = this.messages[this.messages.length - 1].content;
             this.$nextTick(() => {
-              this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
+              this.$refs.scroll.scrollTop = this.$refs.scroll.scrollHeight;
             });
             return;
           }
           if (data.type === 'end') {
             this.socket.disconnect();
+            saveConversation(this.messages);
             return;
           }
           if (data.type === 'delta') {

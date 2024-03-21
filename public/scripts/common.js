@@ -78,6 +78,11 @@ const common = ((window) => {
         this.submit = submit.bind(this);
       },
       mounted() {
+        if (this.$refs.scroll) {
+          this.$nextTick(() => {
+            this.$refs.scroll.scrollTop = this.$refs.scroll.scrollHeight;
+          });
+        }
         if (this.$refs.focus) {
           this.$nextTick(() => {
             this.$refs.focus.focus();

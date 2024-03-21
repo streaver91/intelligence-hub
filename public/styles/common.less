@@ -20,9 +20,14 @@
   user-select: @user-select;
 }
 
+html, body {
+  overscroll-behavior: none;
+}
+
 body {
   min-height: 100vh;
   min-width: 22rem;
+  overflow-y: hidden;
 }
 
 h1,
@@ -329,6 +334,7 @@ button.button--stop {
   input {
     border-radius: 0 1.25rem 1.25rem 0;
     padding-right: 1rem;
+    border-left: 0;
   }
 }
 
