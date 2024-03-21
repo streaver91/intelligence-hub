@@ -1,8 +1,8 @@
 # Intelligence Hub
 
-Intelligence Hub is an AI chat interface designed to allow users to engage in conversations with multiple chatbots simultaneously, providing more comprehensive responses and mitigating the risk of misleading information from nonsensical replies (hallucinations). The platform currently supports two chatbots: OpenAI's ChatGPT and Anthropic's Claude.
+Intelligence Hub is an AI chat interface designed to allow users to engage in conversations with multiple chatbots simultaneously, providing more comprehensive responses and mitigating the risk of misleading information from hallucinations. The platform currently supports two chatbots: OpenAI's ChatGPT and Anthropic's Claude.
 
-![Screenshot of Intelligence Hub](./screenshot.png)
+![Screenshot of Intelligence Hub](./screenshot.gif)
 
 ## Prerequisites
 
