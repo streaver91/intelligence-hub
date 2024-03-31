@@ -29,8 +29,8 @@ gulp.task('minify-js', function () {
     .pipe(gulp.dest('dist/public/scripts'));
 });
 
-gulp.task('copy-favicon', function () {
-  return gulp.src('public/favicon.ico')
+gulp.task('copy-root-assets', function () {
+  return gulp.src('public/*', { nodir: true })
     .pipe(gulp.dest('dist/public'));
 });
 
@@ -40,13 +40,13 @@ gulp.task('copy-images', function () {
 });
 
 gulp.task('build', gulp.parallel(
-  'minify-html', 'compile-less', 'minify-js', 'copy-favicon', 'copy-images'));
+  'minify-html', 'compile-less', 'minify-js', 'copy-root-assets', 'copy-images'));
 
 gulp.task('watch', (callback) => {
   gulp.watch('views/**/*.ejs', gulp.series('minify-html'));
   gulp.watch('public/styles/*.less', gulp.series('compile-less'));
   gulp.watch('public/scripts/*.js', gulp.series('minify-js'));
-  gulp.watch('public/favicon.ico', gulp.series('copy-favicon'));
+  gulp.watch('public/*', gulp.series('copy-root-assets'));
   gulp.watch('public/images/*', gulp.series('copy-images'));
   callback();
 });

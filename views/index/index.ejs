@@ -14,6 +14,7 @@
   <title>Intelligence Hub</title>
   <meta name="description"
     content="Intelligence Hub aggregates responses from major AI chatbots and search engines, providing a centralized platform to explore intelligence insights across various providers.">
+  <link rel="manifest" href="/manifest.json">
 </head>
 
 <div class="content content--chat">
@@ -176,6 +177,17 @@
       }
     });
   };
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(registration => {
+        registration.unregister();
+      });
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js');
+      });
+    });
+  }
 </script>
 
 </html>
