@@ -50,3 +50,21 @@ To start Intelligence Hub, use the following command:
 npm start
 ```
 Afterwards, open your web browser and navigate to the provided local server address to start chatting with both ChatGPT and Claude simultaneously.
+
+## Web App Support
+Intelligence Hub is designed to be mobile-friendly and supports adding the app to the home screen on mobile devices. This feature allows users to access Intelligence Hub as a standalone app, providing a seamless experience similar to native mobile applications.
+
+To add Intelligence Hub to your mobile device's home screen, follow these steps:
+
+### iOS (Safari)
+1. Open Intelligence Hub in Safari on your iOS device.
+2. Tap the "Share" button (square with an up arrow) at the bottom of the screen.
+3. Scroll down and tap "Add to Home Screen."
+4. Customize the app name if desired, then tap "Add" in the top-right corner.
+### Android (Chrome)
+1. Open Intelligence Hub in Chrome on your Android device.
+2. Tap the three-dot menu in the top-right corner.
+3. Tap "Add to Home screen."
+4. Customize the app name if desired, then tap "Add."
+
+After adding Intelligence Hub to your home screen, you can launch it like any other app by tapping its icon.
