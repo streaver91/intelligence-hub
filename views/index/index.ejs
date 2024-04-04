@@ -2,8 +2,7 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+  <link rel="stylesheet" href="/styles/highlight.css">
   <link rel="stylesheet" href="/styles/markdown.css">
   {%- include('../common/head') -%}
   <script defer
@@ -71,7 +70,7 @@
       parseInt('{%= process.env.CONVERSATION_RETENTION_DAYS %}');
 
     const saveConversation = (messages) => {
-      const SIZE_LIMIT = 4096 * 1024;
+      const SIZE_LIMIT = 32768;
       const TIMESTAMP_LIMIT = Date.now() - 86400 * CONVERSATION_RETENTION_DAYS;
       let index;
       let totalSize = 2;
@@ -188,6 +187,30 @@
       });
     });
   }
+
+  navigator.serviceWorker.ready.then(registration => {
+    const updateThemeColor = async () => {
+      const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const themeColor = isDarkMode ? '#000000' : '#ffffff';
+
+      const manifestUrl = '/manifest.json';
+      const manifestResponse = await fetch(manifestUrl);
+      const manifestJson = await manifestResponse.json();
+      manifestJson.theme_color = themeColor;
+      manifestJson.background_color = themeColor;
+      const cache = await caches.open('manifest');
+      await cache.put(manifestUrl, new Response(JSON.stringify(manifestJson), {
+        headers: { 'Content-Type': 'application/json' }
+      }));
+
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      metaThemeColor.setAttribute('content', themeColor);
+    };
+
+    updateThemeColor();
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeColor);
+  });
 </script>
 
 </html>
