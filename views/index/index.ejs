@@ -10,6 +10,7 @@
   <script defer
     src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script defer src="/socket.io/socket.io.js"></script>
+  <script defer src="/scripts/index.js"></script>
   <title>Intelligence Hub</title>
   <meta name="description"
     content="Intelligence Hub aggregates responses from major AI chatbots and search engines, providing a centralized platform to explore intelligence insights across various providers.">
@@ -23,6 +24,10 @@
         <div class="form__chat-message" v-for="message in messages">
           <div class="form__chat-user" v-if="message.role === 'user'">
             <div class="form__chat-bubble" v-text="message.content"></div>
+            <div v-if="message.image" class="form__image-preview">
+              <img :src="message.image" alt="uploaded image"
+                @click.prevent="openImageInNewTab(message.image)">
+            </div>
           </div>
           <div class="form__chat-assistants" v-else-if="message.role === 'assistants'">
             <div class="form__assistant" v-for="(response, assistant) in message.content">
@@ -40,6 +45,13 @@
             @click.prevent="switchMode()" v-if="mode==='eco'">ECO</button>
           <button class="form__pro" :class="{'form__pro--active': mode === 'pro'}"
             @click.prevent="switchMode()" v-if="mode==='pro'">PRO</button>
+          <button class="button--image" @click.prevent="attachImage()">
+            <!-- Image icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48">
+              <path
+                d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm86-157h429q9 0 13-8t-1-16L590-457q-5-6-12-6t-12 6L446-302l-81-111q-5-6-12-6t-12 6l-86 112q-6 8-2 16t13 8Z" />
+            </svg>
+          </button>
           <input ref="focus" type="input" spellcheck="false" id="input" v-model.trim="input"
             placeholder="Message" @keydown.enter.prevent @keyup.enter.exact="send">
           <button @click.prevent="send" :disabled="pending.app" class="button--send"
@@ -51,166 +63,22 @@
             <img src="/images/stop.svg" alt="stop">
           </button>
         </div>
-        <div class="form__oops" v-text="oops.app"></div>
+        <div v-if="image" class="form__image-preview">
+          <img :src="image" alt="uploaded image" @click.prevent="openImageInNewTab(image)">
+          <button class="button--cancel-image" @click.prevent="image=''">
+            <!-- Cancel icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48">
+              <path
+                d="m480-438 129 129q9 9 21 9t21-9q9-9 9-21t-9-21L522-480l129-129q9-9 9-21t-9-21q-9-9-21-9t-21 9L480-522 351-651q-9-9-21-9t-21 9q-9 9-9 21t9 21l129 129-129 129q-9 9-9 21t9 21q9 9 21 9t21-9l129-129Zm0 358q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-156t86-127Q252-817 325-848.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82-31.5 155T763-197.5q-54 54.5-127 86T480-80Z" />
+            </svg>
+        </div>
+        <div class="form__note">
+          AI can make mistakes. Consider checking important information.
+        </div>
       </div>
     </div>
-  </form>
 </div>
-
-<script>
-  window.onload = () => {
-    const loadConversations = () => {
-      const item = localStorage.getItem('messages');
-      const messages = item ? JSON.parse(item) : [];
-      saveConversation(messages);
-      return messages;
-    };
-
-    const CONVERSATION_RETENTION_DAYS =
-      parseInt('{%= process.env.CONVERSATION_RETENTION_DAYS %}');
-
-    const saveConversation = (messages) => {
-      const SIZE_LIMIT = 32768;
-      const TIMESTAMP_LIMIT = Date.now() - 86400 * CONVERSATION_RETENTION_DAYS;
-      let index;
-      let totalSize = 2;
-      for (index = messages.length - 1; index >= 0; --index) {
-        totalSize += JSON.stringify(messages[index]).length + 1;
-        if (totalSize > SIZE_LIMIT || messages[index].timestamp < TIMESTAMP_LIMIT) {
-          break;
-        }
-      }
-      if (messages[index]?.role !== 'user') {
-        index += 1;
-      }
-      localStorage.setItem('messages', JSON.stringify(messages.slice(index)));
-    };
-
-    common.createApp('#app', {
-      messages: loadConversations(),
-      input: '',
-      mode: 'eco',
-      lastUserMessage: '',
-      socket: null,
-    }, {
-      switchMode() {
-        this.mode = this.mode === 'eco' ? 'pro' : 'eco';
-        this.$refs.focus.focus();
-        if (this.input.length === 0) {
-          this.input = this.lastUserMessage;
-
-          this.$nextTick(() => {
-            this.$refs.focus.select();
-          });
-        }
-      },
-      send() {
-        if (this.input === '') {
-          return;
-        }
-        if (this.input === 'clear') {
-          this.messages = [];
-          this.input = '';
-          saveConversation(this.messages);
-          return;
-        }
-        if (this.pending.app) {
-          return;
-        }
-        this.messages = loadConversations();
-        this.pending.app = true;
-        delete this.oops.app;
-        this.messages.push({
-          role: 'user',
-          content: this.input,
-          mode: this.mode,
-          timestamp: Date.now(),
-        });
-        this.lastUserMessage = this.input;
-        this.$nextTick(() => {
-          this.$refs.scroll.scrollTop = this.$refs.scroll.scrollHeight;
-        });
-        this.input = '';
-        this.socket = io();
-        this.socket.on('connect', () => {
-          this.socket.emit('generate', this.messages);
-        });
-        let content = null;
-        this.socket.on('response', (data) => {
-          if (data.type === 'init') {
-            this.messages.push({
-              role: 'assistants',
-              content: data.content,
-              timestamp: Date.now(),
-            });
-            content = this.messages[this.messages.length - 1].content;
-            this.$nextTick(() => {
-              this.$refs.scroll.scrollTop = this.$refs.scroll.scrollHeight;
-            });
-            return;
-          }
-          if (data.type === 'end') {
-            this.socket.disconnect();
-            saveConversation(this.messages);
-            return;
-          }
-          if (data.type === 'delta') {
-            content[data.assistant] += data.content;
-            return;
-          }
-          if (data.type === 'full') {
-            content[data.assistant] = data.content;
-          }
-        });
-        this.socket.on('disconnect', () => {
-          delete this.pending.app;
-        });
-      },
-      stop() {
-        this.socket.disconnect();
-        this.$refs.focus.focus();
-        this.input = this.lastUserMessage;
-        this.$nextTick(() => {
-          this.$refs.focus.select();
-        });
-      }
-    });
-  };
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-      registrations.forEach(registration => {
-        registration.unregister();
-      });
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js');
-      });
-    });
-  }
-
-  navigator.serviceWorker.ready.then(registration => {
-    const updateThemeColor = async () => {
-      const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const themeColor = isDarkMode ? '#000000' : '#ffffff';
-
-      const manifestUrl = '/manifest.json';
-      const manifestResponse = await fetch(manifestUrl);
-      const manifestJson = await manifestResponse.json();
-      manifestJson.theme_color = themeColor;
-      manifestJson.background_color = themeColor;
-      const cache = await caches.open('manifest');
-      await cache.put(manifestUrl, new Response(JSON.stringify(manifestJson), {
-        headers: { 'Content-Type': 'application/json' }
-      }));
-
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      metaThemeColor.setAttribute('content', themeColor);
-    };
-
-    updateThemeColor();
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeColor);
-  });
-</script>
+</form>
+</div>
 
 </html>

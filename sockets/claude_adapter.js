@@ -10,22 +10,61 @@ const ASSISTANT_NAME = {
   'pro': 'Claude 3 Opus',
 };
 
-module.exports.assistantName = (mode) => ASSISTANT_NAME[mode];
+const getMode = (messages) => {
+  const lastMessage = messages[messages.length - 1];
+  return lastMessage.mode === 'pro' ? 'pro' : 'eco';
+};
 
-module.exports.contextNames = () => Object.values(ASSISTANT_NAME);
+const transformMessages = (messages) => {
+  assistantNames = Object.values(ASSISTANT_NAME);
+  queryMessages = [];
+  for (const message of messages.slice(-7)) {
+    if (message.role === 'user') {
+      if (!message.image?.startsWith('data:image')) {
+        queryMessages.push({ role: 'user', content: message.content });
+        continue;
+      }
+      const content = [{ type: 'text', text: message.content }];
+      const [metaData, data] = message.image.split(',');
+      const mediaType = metaData.split(';')[0].split(':')[1];
+      content.push({
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: mediaType,
+          data: data,
+        }
+      });
+      queryMessages.push({
+        role: 'user',
+        content: content,
+      });
+    } else if (message.role === 'assistants') {
+      for (const [assistant, content] of Object.entries(message.content)) {
+        if (assistantNames.includes(assistant)) {
+          queryMessages.push({ role: 'assistant', content: content });
+          break;
+        }
+      }
+    }
+  }
+  return queryMessages;
+};
 
-module.exports.generate = async (messages, mode, socket) => {
+module.exports.assistantName = (messages) => {
+  return ASSISTANT_NAME[getMode(messages)];
+}
+
+module.exports.generate = async (messages, socket) => {
   const client = new anthropic.Anthropic();
-  const assistantName = this.assistantName(mode);
+  const mode = getMode(messages);
+  const assistantName = ASSISTANT_NAME[mode];
   const request = {
     max_tokens: 1024,
-    messages: messages,
+    messages: transformMessages(messages),
     model: MODEL[mode],
     stream: true,
   };
-  if (mode === 'eco') {
-    request['system'] = 'Respond concisely.'
-  }
   const stream = await client.messages.create(request);
   for await (const chunk of stream) {
     if (!socket.connected) {
@@ -35,9 +74,8 @@ module.exports.generate = async (messages, mode, socket) => {
     const data = {
       type: 'delta',
       assistant: assistantName,
-      content: chunk.delta?.text || "",
+      content: chunk.delta?.text || '',
     };
     socket.emit('response', data);
   }
 };
-

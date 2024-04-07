@@ -18,6 +18,7 @@
 @green-700: #0f5132;
 @green-800: #0a3622;
 @yellow-100: #fff3cd;
+@yellow-200: #ffe69c;
 @markdown-black: black;
 @markdown-white: #dee2e6;
 @transition-time: 0.15s;
@@ -29,7 +30,8 @@
   user-select: @user-select;
 }
 
-html, body {
+html,
+body {
   overscroll-behavior: none;
 }
 
@@ -182,6 +184,11 @@ button.button--stop {
   font-size: 0.85rem;
 }
 
+.form__note {
+  color: @gray-600;
+  font-size: 0.85rem;
+}
+
 .form__group--inline {
   align-items: center;
   display: flex;
@@ -245,6 +252,10 @@ button.button--stop {
 
 .form__chat-user {
   text-align: right;
+
+  .form__image-preview {
+    justify-content: right;
+  }
 }
 
 .form__chat-bubble {
@@ -285,7 +296,7 @@ button.button--stop {
   padding: 0.25rem 0;
 
   @media (prefers-color-scheme: dark) {
-    color: @yellow-100;
+    color: @yellow-200;
     border-bottom: 2px solid @gray-800;
   }
 }
@@ -294,7 +305,8 @@ button.button--stop {
   font-size: 0.9rem;
   padding: 0.25rem 0;
 
-  code, code *{
+  code,
+  code * {
     font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
   }
 }
@@ -326,6 +338,7 @@ button.button--stop {
 
 .form__mode--active {
   color: white;
+
   &:hover,
   &:active {
     color: white;
@@ -393,8 +406,90 @@ button.button--stop {
   input {
     border-radius: 0 1.25rem 1.25rem 0;
     padding-right: 1rem;
+    padding-left: 0;
     border-left: 0;
   }
+}
+
+svg {
+  height: 2rem;
+  width: 2rem;
+  padding: 0.25rem;
+
+  path {
+    fill: @gray-600;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    path {
+      fill: @gray;
+    }
+  }
+}
+
+.svg-button {
+  flex: 0;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  height: 2.375rem;
+  padding: 0 0.375rem;
+
+  &:hover,
+  &:active {
+    background-color: white;
+    svg path {
+      fill: @gray;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: @markdown-black;
+
+    &:hover,
+    &:active {
+      background-color: @markdown-black;
+      svg path {
+        fill: @gray-400;
+      }
+    }
+  }
+}
+
+.button--image {
+  .svg-button;
+  border-radius: 0;
+  margin-right: 0;
+  border-width: 1px 0;
+  border-style: solid;
+  border-color: @gray-400;
+
+  @media (prefers-color-scheme: dark) {
+    border-color: @gray-800;
+  }
+}
+
+.form__image-preview {
+  display: flex;
+  margin: 0.75rem 0 0.25rem;
+
+  img {
+    cursor: pointer;
+    border: 2px solid white;
+    max-height: 10rem;
+    z-index: 1000;
+    box-shadow: 0 0 2px 0px @gray-600;
+
+    @media (prefers-color-scheme: dark) {
+      border-color: @gray-600;
+      box-shadow: none;
+    }
+  }
+}
+
+.button--cancel-image {
+  .svg-button;
+  top: -0.25rem;
 }
 
 @media screen and (max-width: 767px) {

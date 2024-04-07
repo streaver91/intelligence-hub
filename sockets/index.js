@@ -1,34 +1,13 @@
 const openaiAdapter = require('./openai_adapter');
 const claudeAdapter = require('./claude_adapter');
-const utils = require('../routes/utils');
 
-const transformMessages = (messages, assistantNames) => {
-  const queryMessages = [];
-  for (const message of messages.slice(-7)) {
-    if (message.role === 'user') {
-      queryMessages.push({ role: 'user', content: message.content });
-      continue;
-    }
-    if (message.role === 'assistants') {
-      for (const [assistant, content] of Object.entries(message.content)) {
-        if (assistantNames.includes(assistant)) {
-          queryMessages.push({ role: 'assistant', content: content });
-          break;
-        }
-      }
-    }
-  }
-  return queryMessages;
-};
-
-const generateWithAdapter = async (adapter, messages, mode, socket) => {
-  const queryMessages = transformMessages(messages, adapter.contextNames());
+const generateWithAdapter = async (adapter, messages, socket) => {
   try {
-    await adapter.generate(queryMessages, mode, socket);
+    await adapter.generate(messages, socket);
   } catch (error) {
     socket.emit('response', {
       type: 'full',
-      assistant: adapter.assistantName(mode),
+      assistant: adapter.assistantName(messages),
       content: 'Error: ' + error.message,
     });
   }
@@ -37,17 +16,16 @@ const generateWithAdapter = async (adapter, messages, mode, socket) => {
 const createSocket = (io) => {
   io.on('connection', (socket) => {
     socket.on('generate', async (messages) => {
-      const mode = messages[messages.length - 1].mode === 'pro' ? 'pro' : 'eco';
       socket.emit('response', {
         type: 'init',
         content: {
-          [openaiAdapter.assistantName(mode)]: '',
-          [claudeAdapter.assistantName(mode)]: '',
+          [openaiAdapter.assistantName(messages)]: '',
+          [claudeAdapter.assistantName(messages)]: '',
         }
       });
       await Promise.all([
-        generateWithAdapter(openaiAdapter, messages, mode, socket),
-        generateWithAdapter(claudeAdapter, messages, mode, socket),
+        generateWithAdapter(openaiAdapter, messages, socket),
+        generateWithAdapter(claudeAdapter, messages, socket),
       ]);
       socket.emit('response', { type: 'end' });
     });
