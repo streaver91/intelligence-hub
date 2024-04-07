@@ -25,8 +25,7 @@
           <div class="form__chat-user" v-if="message.role === 'user'">
             <div class="form__chat-bubble" v-text="message.content"></div>
             <div v-if="message.image" class="form__image-preview">
-              <img :src="message.image" alt="uploaded image"
-                @click.prevent="openImageInNewTab(message.image)">
+              <img :src="message.image" alt="uploaded image">
             </div>
           </div>
           <div class="form__chat-assistants" v-else-if="message.role === 'assistants'">
@@ -64,7 +63,7 @@
           </button>
         </div>
         <div v-if="image" class="form__image-preview">
-          <img :src="image" alt="uploaded image" @click.prevent="openImageInNewTab(image)">
+          <img :src="image" alt="uploaded image">
           <button class="button--cancel-image" @click.prevent="image=''">
             <!-- Cancel icon -->
             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48">
