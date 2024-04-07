@@ -51,6 +51,8 @@ npm start
 ```
 Afterwards, open your web browser and navigate to the provided local server address to start chatting with both ChatGPT and Claude simultaneously.
 
+To clear the messages, simply type "clear" and press enter.
+
 ## Web App Support
 Intelligence Hub is designed to be mobile-friendly and supports adding the app to the home screen on mobile devices. This feature allows users to access Intelligence Hub as a standalone app, providing a seamless experience similar to native mobile applications.
 
