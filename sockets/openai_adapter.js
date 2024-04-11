@@ -2,14 +2,14 @@ const openai = require('openai');
 
 const MODEL = {
   'eco': 'gpt-3.5-turbo',
-  'pro': 'gpt-4-turbo-preview',
-  'vision': 'gpt-4-vision-preview' // GPT-3.5 doesn't support vision.
+  'pro': 'gpt-4-turbo',
+  'vision': 'gpt-4-turbo' // GPT-3.5 doesn't support vision.
 };
 
 const ASSISTANT_NAME = {
   'eco': 'CHATGPT 3.5',
   'pro': 'CHATGPT 4',
-  'vision': 'CHATGPT 4 Vision'
+  'vision': 'CHATGPT 4'
 };
 
 const getMode = (messages) => {
@@ -24,11 +24,17 @@ const getContent = (message, mode) => {
   if (mode !== 'vision') {
     return message.content;
   }
-  const content = [
-    { type: 'text', text: message.content },
-  ];
+  const content = [{
+    type: 'text',
+    text: message.content
+  }];
   if (message.image?.startsWith('data:image')) {
-    content.push({ type: 'image_url', image_url: message.image });
+    content.push({
+      type: 'image_url',
+      image_url: {
+        url: message.image
+      }
+    });
   }
   return content;
 };
