@@ -2,14 +2,14 @@ const openai = require('openai');
 
 const MODEL = {
   'eco': 'gpt-3.5-turbo',
-  'pro': 'gpt-4-turbo',
-  'vision': 'gpt-4-turbo' // GPT-3.5 doesn't support vision.
+  'pro': 'gpt-4o',
+  'vision': 'gpt-4o' // GPT-3.5 doesn't support vision.
 };
 
 const ASSISTANT_NAME = {
   'eco': 'CHATGPT 3.5',
-  'pro': 'CHATGPT 4',
-  'vision': 'CHATGPT 4'
+  'pro': 'CHATGPT 4o',
+  'vision': 'CHATGPT 4o'
 };
 
 const getMode = (messages) => {
