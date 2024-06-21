@@ -1,12 +1,12 @@
 const anthropic = require('@anthropic-ai/sdk');
 
 const MODEL = {
-  'eco': 'claude-3-sonnet-20240229',
+  'eco': 'claude-3-5-sonnet-20240620',
   'pro': 'claude-3-opus-20240229',
 };
 
 const ASSISTANT_NAME = {
-  'eco': 'Claude 3 Sonnet',
+  'eco': 'Claude 3.5 Sonnet',
   'pro': 'Claude 3 Opus',
 };
 

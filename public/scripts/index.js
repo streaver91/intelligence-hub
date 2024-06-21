@@ -108,6 +108,9 @@ window.onload = async () => {
       }
     },
     async send() {
+      if (this.input === '' && this.image !== '') {
+        this.input = ' [image]';
+      }
       if (this.input === '') {
         return;
       }
